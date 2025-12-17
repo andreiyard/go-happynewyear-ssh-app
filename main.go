@@ -13,9 +13,6 @@ import (
 //TODO: Draw a christmas tree (snowflakes should cover it after some time)
 //TODO: Stop generating snowflakes after some limit (or start deleting the old ones)
 
-// Possible chars for a snowflake
-var snowflakeChars = [...]string{"*", "+", "."}
-
 const fps = 6
 
 // New snowflake amount per frame
@@ -100,14 +97,14 @@ func (s Snowflakes) placeSnowflake(x, y int, char string) {
 	s[Point{x, y}] = char
 }
 
-func (s Snowflakes) addSnowflake(x, y int) {
-	char := snowflakeChars[rand.Intn(len(snowflakeChars))]
+func (s Snowflakes) addSnowflake(x, y int, options []string) {
+	char := options[rand.Intn(len(options))]
 	s.placeSnowflake(x, y, char)
 }
 
-func (s Snowflakes) addRandomPosSnowflake(maxX int) {
+func (s Snowflakes) addRandomPosSnowflake(maxX int, options []string) {
 	x := rand.Intn(maxX)
-	s.addSnowflake(x, 0)
+	s.addSnowflake(x, 0, options)
 }
 
 func (s Snowflakes) exists(p Point) bool {
@@ -129,8 +126,13 @@ func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 }
 
 type model struct {
-	cells      cellbuffer
-	snowflakes Snowflakes
+	cells          cellbuffer
+	snowflakes     Snowflakes
+	snowflakeChars []string
+}
+
+func NewModel(snowflakeChars []string) model {
+	return model{snowflakeChars: snowflakeChars}
 }
 
 func (m model) Init() tea.Cmd {
@@ -152,7 +154,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.MouseMsg:
 		//Add new snowflake at pos of mouse click
-		m.snowflakes.addSnowflake(msg.X, msg.Y)
+		m.snowflakes.addSnowflake(msg.X, msg.Y, m.snowflakeChars)
 		return m, nil
 	case frameMsg:
 		if !m.cells.ready() {
@@ -165,7 +167,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		maxX := m.cells.width() - 1
 		maxY := m.cells.height() - 1
 		for range snowflakeRate {
-			m.snowflakes.addRandomPosSnowflake(maxX)
+			m.snowflakes.addRandomPosSnowflake(maxX, m.snowflakeChars)
 		}
 		m.snowflakes = m.snowflakes.advanceAll(maxY)
 
@@ -182,7 +184,7 @@ func (m model) View() string {
 }
 
 func main() {
-	m := model{}
+	m := NewModel([]string{"*", "+", "."})
 
 	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
