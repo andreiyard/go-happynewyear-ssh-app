@@ -1,9 +1,7 @@
-package main
+package bubbletea
 
 import (
-	"fmt"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 
@@ -181,14 +179,4 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	return m.cells.String()
-}
-
-func main() {
-	m := NewModel([]string{"*", "+", "."})
-
-	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
-	if _, err := p.Run(); err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
 }
