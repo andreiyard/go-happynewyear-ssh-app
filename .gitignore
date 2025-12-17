@@ -1,0 +1,2 @@
+# Ignore SSH server generated key
+.ssh/
