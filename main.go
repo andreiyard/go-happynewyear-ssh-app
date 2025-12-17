@@ -1,11 +1,8 @@
 package main
 
-// A simple example demonstrating how to draw and animate on a cellular grid.
-// Note that the cellbuffer implementation in this example does not support
-// double-width runes.
-
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -13,9 +10,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+// Possible chars for a snowflake
 var snowflakeChars = [...]string{"*", "+", "."}
 
-const fps = 60
+const fps = 3
+
+// New snowflake amount per frame
+const snowflakeRate = 5
 
 type cellbuffer struct {
 	cells  []string
@@ -80,14 +81,53 @@ func animate() tea.Cmd {
 	})
 }
 
-type Snowflake struct {
-	x, y int    // position
-	char string // char from snowflakeChars
+type Point struct {
+	x, y int // position
+}
+
+type Snowflakes map[Point]string
+
+func (s Snowflakes) drawSnowflakes(cellbuffer *cellbuffer) {
+	for pos, char := range s {
+		cellbuffer.setChar(pos.x, pos.y, char)
+	}
+}
+
+func (s Snowflakes) placeSnowflake(x, y int, char string) {
+	s[Point{x, y}] = char
+}
+
+func (s Snowflakes) addSnowflake(x, y int) {
+	char := snowflakeChars[rand.Intn(len(snowflakeChars))]
+	s.placeSnowflake(x, y, char)
+}
+
+func (s Snowflakes) addRandomPosSnowflake(maxX int) {
+	x := rand.Intn(maxX)
+	s.addSnowflake(x, 0)
+}
+
+func (s Snowflakes) exists(p Point) bool {
+	_, exists := s[p]
+	return exists
+}
+
+func (s Snowflakes) advanceAll(maxY int) Snowflakes {
+	newSnowflakes := make(Snowflakes)
+	for pos, char := range s {
+		nextPoint := Point{pos.x, pos.y + 1}
+		if pos.y == maxY || s.exists(nextPoint) {
+			newSnowflakes[pos] = char
+		} else {
+			newSnowflakes[nextPoint] = char
+		}
+	}
+	return newSnowflakes
 }
 
 type model struct {
 	cells      cellbuffer
-	snowflakes []Snowflake
+	snowflakes Snowflakes
 }
 
 func (m model) Init() tea.Cmd {
@@ -104,11 +144,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.WindowSizeMsg:
 		// Reinit animation on window change
-		m.snowflakes = make([]Snowflake, 0, 100)
+		m.snowflakes = make(Snowflakes)
 		m.cells.init(msg.Width, msg.Height)
 		return m, nil
 	case tea.MouseMsg:
-		// TODO: Implement snowflake creation at pos of mouse click
+		//Add new snowflake at pos of mouse click
+		m.snowflakes.addSnowflake(msg.X, msg.Y)
 		return m, nil
 	case frameMsg:
 		if !m.cells.ready() {
@@ -118,13 +159,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.cells.wipe()
 
 		// Create new snowflakes and advance existing
-		m.cells.setChar(10, 11, "*")
-		m.cells.setChar(11, 12, "*")
-		m.cells.setChar(12, 14, "*")
-		m.cells.setChar(15, 17, "*")
+		maxX := m.cells.width() - 1
+		maxY := m.cells.height() - 1
+		for _ = range snowflakeRate {
+			m.snowflakes.addRandomPosSnowflake(maxX)
+		}
+		m.snowflakes = m.snowflakes.advanceAll(maxY)
 
-		// Render snowflakes on the frame
-		//drawSnowflakes(&m.cells, &m.snowflakes)
+		// Draw all snowflakes on the frame
+		m.snowflakes.drawSnowflakes(&m.cells)
 		return m, animate()
 	default:
 		return m, nil
