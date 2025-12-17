@@ -10,13 +10,16 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+//TODO: Draw a christmas tree (snowflakes should cover it after some time)
+//TODO: Stop generating snowflakes after some limit (or start deleting the old ones)
+
 // Possible chars for a snowflake
 var snowflakeChars = [...]string{"*", "+", "."}
 
-const fps = 3
+const fps = 6
 
 // New snowflake amount per frame
-const snowflakeRate = 5
+const snowflakeRate = 2
 
 type cellbuffer struct {
 	cells  []string
@@ -161,7 +164,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Create new snowflakes and advance existing
 		maxX := m.cells.width() - 1
 		maxY := m.cells.height() - 1
-		for _ = range snowflakeRate {
+		for range snowflakeRate {
 			m.snowflakes.addRandomPosSnowflake(maxX)
 		}
 		m.snowflakes = m.snowflakes.advanceAll(maxY)
