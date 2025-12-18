@@ -26,8 +26,6 @@ const (
 	port = "32222"
 )
 
-var snowflakeChars = []string{"*", "+", "."}
-
 func main() {
 	modelCfg := config.Load()
 	teaHandler := newHandler(modelCfg)
