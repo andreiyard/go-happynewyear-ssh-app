@@ -27,5 +27,4 @@ go run ./cmd/app-ssh
 3. Improve and polish visuals
 
 ## TODO:
-- Check if I can use mouse via SSH
 - Add preview image to the repo
