@@ -25,3 +25,7 @@ go run ./cmd/app-ssh
 ~~1. Develop TUI animation using bubbletea~~  
 ~~2. Wrap resulting application in wish to be able to serve via SSH~~  
 3. Improve and polish visuals
+
+## TODO:
+- Check if I can use mouse via SSH
+- Add preview image to the repo
