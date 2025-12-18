@@ -20,18 +20,12 @@ import (
 	"github.com/charmbracelet/wish/logging"
 )
 
-// TODO: Get SSH config from ENV vars
-const (
-	host = "localhost"
-	port = "32222"
-)
-
 func main() {
-	modelCfg := config.Load()
-	teaHandler := newHandler(modelCfg)
+	cfg := config.LoadWithSSH()
+	teaHandler := newHandler(cfg.BaseConfig)
 
 	s, err := wish.NewServer(
-		wish.WithAddress(net.JoinHostPort(host, port)),
+		wish.WithAddress(net.JoinHostPort(cfg.Host, cfg.Port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
 		wish.WithMiddleware(
 			bubbletea.Middleware(teaHandler),
@@ -45,7 +39,7 @@ func main() {
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	log.Info("Starting SSH server", "host", host, "port", port)
+	log.Info("Starting SSH server", "host", cfg.Host, "port", cfg.Port)
 	go func() {
 		if err = s.ListenAndServe(); err != nil && !errors.Is(err, ssh.ErrServerClosed) {
 			log.Error("Could not start server", "error", err)
@@ -62,7 +56,7 @@ func main() {
 	}
 }
 
-func newHandler(cfg config.Config) bubbletea.Handler {
+func newHandler(cfg config.BaseConfig) bubbletea.Handler {
 	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		_, _, active := s.Pty()
 		if !active {

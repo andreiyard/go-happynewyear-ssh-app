@@ -9,17 +9,23 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
+type BaseConfig struct {
 	Fps             int
 	SnowflakeRate   int      // Amount of snowflakes that spawn each frame
 	SnowflakesLimit int      // Max number of snowflakes on the screen
 	SnowflakeChars  []string // Possible chars for snowflakes
 }
 
-func Load() Config {
+type ConfigSSH struct {
+	BaseConfig
+	Host string
+	Port string
+}
+
+func Load() BaseConfig {
 	godotenv.Load()
 
-	return Config{
+	return BaseConfig{
 		Fps:             getRequiredInt("SNOWFLAKE_FPS"),
 		SnowflakeRate:   getRequiredInt("SNOWFLAKE_RATE"),
 		SnowflakesLimit: getOptionalInt("SNOWFLAKE_LIMIT", 800),
@@ -30,6 +36,14 @@ func Load() Config {
 			}
 			return strings.Split(val, "")
 		}("SNOWFLAKE_CHARS"),
+	}
+}
+
+func LoadWithSSH() ConfigSSH {
+	return ConfigSSH{
+		BaseConfig: Load(),
+		Host:       getRequired("SNOWFLAKE_SSH_HOST"),
+		Port:       getRequired("SNOWFLAKE_SSH_PORT"),
 	}
 }
 
