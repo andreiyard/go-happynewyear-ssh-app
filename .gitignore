@@ -1,2 +1,4 @@
+.env
+
 # Ignore SSH server generated key
 .ssh/
