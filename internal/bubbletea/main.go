@@ -9,7 +9,6 @@ import (
 )
 
 //TODO: Draw a christmas tree (snowflakes should cover it after some time)
-//TODO: Stop generating snowflakes after some limit (or start deleting the old ones)
 
 type cellbuffer struct {
 	cells  []string
@@ -105,6 +104,17 @@ func (s Snowflakes) exists(p Point) bool {
 	return exists
 }
 
+func (s Snowflakes) deleteRandomN(n int) {
+	count := 0
+	for k := range s {
+		if count >= n {
+			return
+		}
+		delete(s, k)
+		count++
+	}
+}
+
 func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 	newSnowflakes := make(Snowflakes)
 	for pos, char := range s {
@@ -121,7 +131,7 @@ func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 type model struct {
 	fps            int
 	snowflakeRate  int
-	snowflakeLimit int // TODO: Use to autodelete snowflakes over limit
+	snowflakeLimit int
 	cells          cellbuffer
 	snowflakes     Snowflakes
 	snowflakeChars []string
@@ -164,6 +174,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Wipe last frame
 		m.cells.wipe()
 
+		// TODO: Add gravity effect (to solve issue with random 1-char width tower of snowflakes)
+		// We can check left and right col and if it has 2-3 cells of empty space snowflake will slide there
+
 		// Create new snowflakes and advance existing
 		maxX := m.cells.width() - 1
 		maxY := m.cells.height() - 1
@@ -172,6 +185,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.snowflakes = m.snowflakes.advanceAll(maxY)
 
+		// Delete random snowflakes if above limit (limit=0 means no limit)
+		if m.snowflakeLimit != 0 {
+			excessSnowflakes := len(m.snowflakes) - m.snowflakeLimit
+			if excessSnowflakes > 0 {
+				m.snowflakes.deleteRandomN(excessSnowflakes)
+			}
+		}
 		// Draw all snowflakes on the frame
 		m.snowflakes.drawSnowflakes(&m.cells)
 		return m, m.animate()
