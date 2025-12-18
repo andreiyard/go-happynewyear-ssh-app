@@ -34,7 +34,7 @@ func main() {
 		),
 	)
 	if err != nil {
-		log.Error("Could not start server", "error", err)
+		log.Fatal("Could not start server", "error", err)
 	}
 
 	done := make(chan os.Signal, 1)
