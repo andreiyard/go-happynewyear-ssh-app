@@ -10,6 +10,7 @@ import (
 	"time"
 
 	app "github.com/andreiyard/go-happynewyear-ssh-app/internal/bubbletea"
+	"github.com/andreiyard/go-happynewyear-ssh-app/internal/config"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
@@ -19,6 +20,7 @@ import (
 	"github.com/charmbracelet/wish/logging"
 )
 
+// TODO: Get SSH config from ENV vars
 const (
 	host = "localhost"
 	port = "32222"
@@ -27,6 +29,9 @@ const (
 var snowflakeChars = []string{"*", "+", "."}
 
 func main() {
+	modelCfg := config.Load()
+	teaHandler := newHandler(modelCfg)
+
 	s, err := wish.NewServer(
 		wish.WithAddress(net.JoinHostPort(host, port)),
 		wish.WithHostKeyPath(".ssh/id_ed25519"),
@@ -59,13 +64,15 @@ func main() {
 	}
 }
 
-func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-	_, _, active := s.Pty()
-	if !active {
-		wish.Fatalln(s, "no active terminal, skipping")
-		return nil, nil
-	}
+func newHandler(cfg config.Config) bubbletea.Handler {
+	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+		_, _, active := s.Pty()
+		if !active {
+			wish.Fatalln(s, "no active terminal, skipping")
+			return nil, nil
+		}
 
-	m := app.NewModel(snowflakeChars)
-	return m, []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
+		m := app.NewModel(cfg.Fps, cfg.SnowflakeRate, cfg.SnowflakesLimit, cfg.SnowflakeChars)
+		return m, []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
+	}
 }

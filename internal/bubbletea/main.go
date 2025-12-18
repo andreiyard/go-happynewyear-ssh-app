@@ -11,11 +11,6 @@ import (
 //TODO: Draw a christmas tree (snowflakes should cover it after some time)
 //TODO: Stop generating snowflakes after some limit (or start deleting the old ones)
 
-const fps = 6
-
-// New snowflake amount per frame
-const snowflakeRate = 2
-
 type cellbuffer struct {
 	cells  []string
 	stride int
@@ -73,8 +68,8 @@ func (c cellbuffer) String() string {
 
 type frameMsg struct{}
 
-func animate() tea.Cmd {
-	return tea.Tick(time.Second/fps, func(_ time.Time) tea.Msg {
+func (m model) animate() tea.Cmd {
+	return tea.Tick(time.Second/time.Duration(m.fps), func(_ time.Time) tea.Msg {
 		return frameMsg{}
 	})
 }
@@ -124,17 +119,25 @@ func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 }
 
 type model struct {
+	fps            int
+	snowflakeRate  int
+	snowflakeLimit int // TODO: Use to autodelete snowflakes over limit
 	cells          cellbuffer
 	snowflakes     Snowflakes
 	snowflakeChars []string
 }
 
-func NewModel(snowflakeChars []string) model {
-	return model{snowflakeChars: snowflakeChars}
+func NewModel(fps, snowflakeRate, snowflakeLimit int, snowflakeChars []string) model {
+	return model{
+		fps:            fps,
+		snowflakeRate:  snowflakeRate,
+		snowflakeLimit: snowflakeLimit,
+		snowflakeChars: snowflakeChars,
+	}
 }
 
 func (m model) Init() tea.Cmd {
-	return animate()
+	return m.animate()
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -164,14 +167,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Create new snowflakes and advance existing
 		maxX := m.cells.width() - 1
 		maxY := m.cells.height() - 1
-		for range snowflakeRate {
+		for range m.snowflakeRate {
 			m.snowflakes.addRandomPosSnowflake(maxX, m.snowflakeChars)
 		}
 		m.snowflakes = m.snowflakes.advanceAll(maxY)
 
 		// Draw all snowflakes on the frame
 		m.snowflakes.drawSnowflakes(&m.cells)
-		return m, animate()
+		return m, m.animate()
 	default:
 		return m, nil
 	}
