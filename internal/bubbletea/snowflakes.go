@@ -3,14 +3,14 @@ package bubbletea
 import "math/rand"
 
 type Point struct {
-	x, y int // position
+	X, Y int // position
 }
 
 type Snowflakes map[Point]string
 
 func (s Snowflakes) drawSnowflakes(cellbuffer *cellbuffer) {
 	for pos, char := range s {
-		cellbuffer.setChar(pos.x, pos.y, char)
+		cellbuffer.setChar(pos.X, pos.Y, char)
 	}
 }
 
@@ -47,8 +47,8 @@ func (s Snowflakes) deleteRandomN(n int) {
 func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 	newSnowflakes := make(Snowflakes)
 	for pos, char := range s {
-		nextPoint := Point{pos.x, pos.y + 1}
-		if pos.y == maxY || s.exists(nextPoint) {
+		nextPoint := Point{pos.X, pos.Y + 1}
+		if pos.Y == maxY || s.exists(nextPoint) {
 			newSnowflakes[pos] = char
 		} else {
 			newSnowflakes[nextPoint] = char
