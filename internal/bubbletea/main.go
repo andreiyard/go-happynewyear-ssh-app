@@ -6,8 +6,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-//TODO: Draw a christmas tree (snowflakes should cover it after some time)
-
 type frameMsg struct{}
 
 func (m model) animate() tea.Cmd {
@@ -23,6 +21,7 @@ type model struct {
 	cells          cellbuffer
 	snowflakes     Snowflakes
 	snowflakeChars []string
+	tree           Tree
 }
 
 func NewModel(fps, snowflakeRate, snowflakeLimit int, snowflakeChars []string) model {
@@ -32,6 +31,14 @@ func NewModel(fps, snowflakeRate, snowflakeLimit int, snowflakeChars []string) m
 		snowflakeLimit: snowflakeLimit,
 		snowflakeChars: snowflakeChars,
 	}
+}
+
+func (m *model) reinit(w, h int) {
+	treeHeight := h - h/4
+	treeWidth := treeHeight
+	m.tree = newTree(treeWidth, treeHeight, w, h)
+	m.snowflakes = make(Snowflakes)
+	m.cells.init(w, h)
 }
 
 func (m model) Init() tea.Cmd {
@@ -47,9 +54,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, nil
 	case tea.WindowSizeMsg:
-		// Reinit animation on window change
-		m.snowflakes = make(Snowflakes)
-		m.cells.init(msg.Width, msg.Height)
+		// Reinit animation and tree on window change
+		m.reinit(msg.Width, msg.Height)
 		return m, nil
 	case tea.MouseMsg:
 		//Add new snowflake at pos of mouse click
@@ -82,6 +88,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		// Draw all snowflakes on the frame
 		m.snowflakes.drawSnowflakes(&m.cells)
+
+		// Draw a tree on the frame
+		m.tree.draw(&m.cells)
+
 		return m, m.animate()
 	default:
 		return m, nil
