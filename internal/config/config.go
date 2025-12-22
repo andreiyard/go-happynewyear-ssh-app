@@ -18,8 +18,9 @@ type BaseConfig struct {
 
 type ConfigSSH struct {
 	BaseConfig
-	Host string
-	Port string
+	Host        string
+	Port        string
+	HostkeyPath string
 }
 
 func Load() BaseConfig {
@@ -41,15 +42,24 @@ func Load() BaseConfig {
 
 func LoadWithSSH() ConfigSSH {
 	return ConfigSSH{
-		BaseConfig: Load(),
-		Host:       getRequired("SNOWFLAKE_SSH_HOST"),
-		Port:       getRequired("SNOWFLAKE_SSH_PORT"),
+		BaseConfig:  Load(),
+		Host:        getRequired("SNOWFLAKE_SSH_HOST"),
+		Port:        getRequired("SNOWFLAKE_SSH_PORT"),
+		HostkeyPath: getOptionalString("SNOWFLAKE_SSH_HOSTKEY", ".ssh/id_ed25519"),
 	}
 }
 
 func getRequiredInt(varName string) int {
 	val := getRequired(varName)
 	return mustBeInt(varName, val)
+}
+
+func getOptionalString(varName, defaultVal string) string {
+	val := os.Getenv(varName)
+	if val == "" {
+		return defaultVal
+	}
+	return val
 }
 
 func getOptionalInt(varName string, defaultVal int) int {
