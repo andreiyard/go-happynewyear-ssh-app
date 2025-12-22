@@ -1,3 +1,5 @@
+.PHONY: help compile build-local build-ssh test fmt clear all
+
 help:
 	@echo "Available targets:"
 	@echo "compile     - Build all binaries"
