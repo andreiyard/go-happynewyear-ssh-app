@@ -176,7 +176,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			},
 			maxY: 10,
 			want: Snowflakes{
-				{4, 10}:  "*",
+				{4, 10}: "*",
 				{5, 10}: "+",
 			},
 		},
@@ -385,7 +385,10 @@ func TestSnowflakes_DrawSnowflakes(t *testing.T) {
 		snowflakes Snowflakes
 		width      int
 		height     int
-		wantAt     []struct{ x, y int; char string }
+		wantAt     []struct {
+			x, y int
+			char string
+		}
 	}{
 		{
 			name: "single snowflake",
@@ -394,7 +397,10 @@ func TestSnowflakes_DrawSnowflakes(t *testing.T) {
 			},
 			width:  5,
 			height: 3,
-			wantAt: []struct{ x, y int; char string }{
+			wantAt: []struct {
+				x, y int
+				char string
+			}{
 				{2, 1, "*"},
 			},
 		},
@@ -407,7 +413,10 @@ func TestSnowflakes_DrawSnowflakes(t *testing.T) {
 			},
 			width:  5,
 			height: 3,
-			wantAt: []struct{ x, y int; char string }{
+			wantAt: []struct {
+				x, y int
+				char string
+			}{
 				{0, 0, "*"},
 				{4, 2, "+"},
 				{2, 1, "."},

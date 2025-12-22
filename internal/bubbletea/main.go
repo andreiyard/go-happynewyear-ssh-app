@@ -15,22 +15,22 @@ func (m model) animate() tea.Cmd {
 }
 
 type model struct {
-	fps                  int
-	snowflakeRate        int
+	fps                   int
+	snowflakeRate         int
 	snowflakeLimitPercent int
-	effectiveLimit       int
-	cells                cellbuffer
-	snowflakes           Snowflakes
-	snowflakeChars       []string
-	tree                 Tree
+	effectiveLimit        int
+	cells                 cellbuffer
+	snowflakes            Snowflakes
+	snowflakeChars        []string
+	tree                  Tree
 }
 
 func NewModel(fps, snowflakeRate, snowflakeLimitPercent int, snowflakeChars []string) model {
 	return model{
-		fps:                  fps,
-		snowflakeRate:        snowflakeRate,
+		fps:                   fps,
+		snowflakeRate:         snowflakeRate,
 		snowflakeLimitPercent: snowflakeLimitPercent,
-		snowflakeChars:       snowflakeChars,
+		snowflakeChars:        snowflakeChars,
 	}
 }
 

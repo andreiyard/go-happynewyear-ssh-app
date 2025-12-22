@@ -197,14 +197,20 @@ func TestCellbuffer_String(t *testing.T) {
 		name   string
 		width  int
 		height int
-		chars  []struct{ x, y int; char string }
-		want   string
+		chars  []struct {
+			x, y int
+			char string
+		}
+		want string
 	}{
 		{
 			name:   "3x2 grid with stars",
 			width:  3,
 			height: 2,
-			chars: []struct{ x, y int; char string }{
+			chars: []struct {
+				x, y int
+				char string
+			}{
 				{0, 0, "*"},
 				{2, 0, "*"},
 				{1, 1, "+"},
@@ -222,7 +228,10 @@ func TestCellbuffer_String(t *testing.T) {
 			name:   "single row",
 			width:  5,
 			height: 1,
-			chars: []struct{ x, y int; char string }{
+			chars: []struct {
+				x, y int
+				char string
+			}{
 				{0, 0, "a"},
 				{4, 0, "b"},
 			},
@@ -249,11 +258,11 @@ func TestCellbuffer_String(t *testing.T) {
 
 func TestCellbuffer_Ready(t *testing.T) {
 	tests := []struct {
-		name       string
-		init       bool
-		width      int
-		height     int
-		wantReady  bool
+		name      string
+		init      bool
+		width     int
+		height    int
+		wantReady bool
 	}{
 		{
 			name:      "initialized buffer",
