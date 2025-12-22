@@ -1,4 +1,4 @@
-.PHONY: help compile build-local build-ssh test fmt clear all
+.PHONY: help compile build-local build-ssh test fmt clean all
 
 help:
 	@echo "Available targets:"
@@ -25,7 +25,7 @@ test:
 fmt:
 	go fmt ./...
 
-clear:
+clean:
 	rm -rf bin/
 	rm -f coverage.out
 
