@@ -3,5 +3,6 @@
 # Ignore SSH server generated key
 .ssh/
 
-# Ignore compiled binaries
+# Ignore compiled binaries and outputs
 bin/
+*.out
