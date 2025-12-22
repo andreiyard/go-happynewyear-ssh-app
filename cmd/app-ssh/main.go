@@ -64,7 +64,7 @@ func newHandler(cfg config.BaseConfig) bubbletea.Handler {
 			return nil, nil
 		}
 
-		m := app.NewModel(cfg.Fps, cfg.SnowflakeRate, cfg.SnowflakesLimit, cfg.SnowflakeChars)
+		m := app.NewModel(cfg.Fps, cfg.SnowflakeRate, cfg.SnowflakeLimitPercent, cfg.SnowflakeChars)
 		return m, []tea.ProgramOption{tea.WithAltScreen(), tea.WithMouseCellMotion()}
 	}
 }

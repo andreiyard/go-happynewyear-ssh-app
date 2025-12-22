@@ -10,10 +10,10 @@ import (
 )
 
 type BaseConfig struct {
-	Fps             int
-	SnowflakeRate   int      // Amount of snowflakes that spawn each frame
-	SnowflakesLimit int      // Max number of snowflakes on the screen
-	SnowflakeChars  []string // Possible chars for snowflakes
+	Fps                   int
+	SnowflakeRate         int      // Amount of snowflakes that spawn each frame
+	SnowflakeLimitPercent int      // Percentage of screen area (0 = no limit)
+	SnowflakeChars        []string // Possible chars for snowflakes
 }
 
 type ConfigSSH struct {
@@ -27,9 +27,9 @@ func Load() BaseConfig {
 	godotenv.Load()
 
 	return BaseConfig{
-		Fps:             getRequiredInt("SNOWFLAKE_FPS"),
-		SnowflakeRate:   getRequiredInt("SNOWFLAKE_RATE"),
-		SnowflakesLimit: getOptionalInt("SNOWFLAKE_LIMIT", 800),
+		Fps:                   getRequiredInt("SNOWFLAKE_FPS"),
+		SnowflakeRate:         getRequiredInt("SNOWFLAKE_RATE"),
+		SnowflakeLimitPercent: getOptionalInt("SNOWFLAKE_LIMIT_PERCENT", 10),
 		SnowflakeChars: func(n string) []string {
 			val := os.Getenv(n)
 			if val == "" {

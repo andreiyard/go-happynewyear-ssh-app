@@ -15,22 +15,35 @@ func (m model) animate() tea.Cmd {
 }
 
 type model struct {
-	fps            int
-	snowflakeRate  int
-	snowflakeLimit int
-	cells          cellbuffer
-	snowflakes     Snowflakes
-	snowflakeChars []string
-	tree           Tree
+	fps                  int
+	snowflakeRate        int
+	snowflakeLimitPercent int
+	effectiveLimit       int
+	cells                cellbuffer
+	snowflakes           Snowflakes
+	snowflakeChars       []string
+	tree                 Tree
 }
 
-func NewModel(fps, snowflakeRate, snowflakeLimit int, snowflakeChars []string) model {
+func NewModel(fps, snowflakeRate, snowflakeLimitPercent int, snowflakeChars []string) model {
 	return model{
-		fps:            fps,
-		snowflakeRate:  snowflakeRate,
-		snowflakeLimit: snowflakeLimit,
-		snowflakeChars: snowflakeChars,
+		fps:                  fps,
+		snowflakeRate:        snowflakeRate,
+		snowflakeLimitPercent: snowflakeLimitPercent,
+		snowflakeChars:       snowflakeChars,
 	}
+}
+
+func (m *model) calculateEffectiveLimit() {
+	// No limit if percentage is 0
+	if m.snowflakeLimitPercent == 0 {
+		m.effectiveLimit = 0
+		return
+	}
+
+	// Calculate percentage-based limit
+	screenArea := m.cells.width() * m.cells.height()
+	m.effectiveLimit = (screenArea * m.snowflakeLimitPercent) / 100
 }
 
 func (m *model) reinit(w, h int) {
@@ -39,6 +52,7 @@ func (m *model) reinit(w, h int) {
 	m.tree = newTree(treeWidth, treeHeight, w, h)
 	m.snowflakes = make(Snowflakes)
 	m.cells.init(w, h)
+	m.calculateEffectiveLimit()
 }
 
 func (m model) Init() tea.Cmd {
@@ -77,8 +91,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.snowflakes = m.snowflakes.advanceAll(maxY)
 
 		// Delete random snowflakes if above limit (limit=0 means no limit)
-		if m.snowflakeLimit != 0 {
-			excessSnowflakes := len(m.snowflakes) - m.snowflakeLimit
+		if m.effectiveLimit != 0 {
+			excessSnowflakes := len(m.snowflakes) - m.effectiveLimit
 			if excessSnowflakes > 0 {
 				m.snowflakes.deleteRandomN(excessSnowflakes)
 			}
