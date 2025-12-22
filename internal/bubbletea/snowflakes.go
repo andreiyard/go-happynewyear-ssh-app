@@ -6,6 +6,10 @@ type Point struct {
 	X, Y int // position
 }
 
+func (p Point) move(dx, dy int) Point {
+	return Point{p.X + dx, p.Y + dy}
+}
+
 type Snowflakes map[Point]string
 
 func (s Snowflakes) drawSnowflakes(cellbuffer *cellbuffer) {
@@ -48,9 +52,19 @@ func (s Snowflakes) advanceAll(maxY int) Snowflakes {
 	newSnowflakes := make(Snowflakes)
 	for pos, char := range s {
 		nextPoint := Point{pos.X, pos.Y + 1}
-		if pos.Y == maxY || s.exists(nextPoint) {
+		switch {
+		case pos.Y == maxY: // if at the bottom, place at the same pos
 			newSnowflakes[pos] = char
-		} else {
+		case s.exists(nextPoint): // if on top of next snowflake, try fall to the side
+			// Check left, then right, as a default stay at the same pos
+			if !s.exists(pos.move(-1, 0)) && !s.exists(pos.move(-1, 1)) && !s.exists(pos.move(-1, 2)) {
+				newSnowflakes[pos.move(-1, 1)] = char
+			} else if !s.exists(pos.move(1, 0)) && !s.exists(pos.move(1, 1)) && !s.exists(pos.move(1, 2)) {
+				newSnowflakes[pos.move(1, 1)] = char
+			} else {
+				newSnowflakes[pos] = char
+			}
+		default: // If can fall, place at the next pos
 			newSnowflakes[nextPoint] = char
 		}
 	}

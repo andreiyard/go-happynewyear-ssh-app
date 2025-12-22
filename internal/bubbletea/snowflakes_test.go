@@ -128,7 +128,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			},
 			maxY: 10,
 			want: Snowflakes{
-				{5, 3}: "*",
+				{4, 4}: "*",
 				{5, 5}: "+",
 			},
 		},
@@ -156,7 +156,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			},
 			maxY: 10,
 			want: Snowflakes{
-				{3, 5}:  "*",
+				{2, 6}:  "*",
 				{3, 7}:  "+",
 				{3, 10}: ".",
 				{7, 3}:  "*",
@@ -176,7 +176,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			},
 			maxY: 10,
 			want: Snowflakes{
-				{5, 9}:  "*",
+				{4, 10}:  "*",
 				{5, 10}: "+",
 			},
 		},

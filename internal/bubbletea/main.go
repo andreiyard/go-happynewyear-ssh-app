@@ -68,9 +68,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Wipe last frame
 		m.cells.wipe()
 
-		// TODO: Add gravity effect (to solve issue with random 1-char width tower of snowflakes)
-		// We can check left and right col and if it has 2-3 cells of empty space snowflake will slide there
-
 		// Create new snowflakes and advance existing
 		maxX := m.cells.width() - 1
 		maxY := m.cells.height() - 1
