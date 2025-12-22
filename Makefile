@@ -1,15 +1,30 @@
-compile: app-local app-ssh
+help:
+	@echo "Available targets:"
+	@echo "compile     - Build all binaries"
+	@echo "build-local - Build local TUI app"
+	@echo "build-ssh   - Build SSH server app"
+	@echo "test        - Run tests"
+	@echo "fmt         - Format all go files"
+	@echo "clear       - Clear bin/"
+	@echo "all         - Clear bin/, run tests, compile"
 
-app-local:
+
+compile: build-local build-ssh
+
+build-local:
 	go build -o bin/app-local ./cmd/app-local/
 
-app-ssh:
+build-ssh:
 	go build -o bin/app-ssh ./cmd/app-ssh/
 
 test:
-	go test ./...
+	go test -race -coverprofile=coverage.out ./...
+
+fmt:
+	go fmt ./...
 
 clear:
-	rm bin/* | echo "dir empty"
+	rm -rf bin/
+	rm -f coverage.out
 
-all: clear test compile
+all: fmt test compile
