@@ -121,7 +121,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			want:       Snowflakes{{5, 10}: "*"},
 		},
 		{
-			name: "snowflake on top of another stays, bottom one moves",
+			name: "collision triggers left diagonal slide",
 			snowflakes: Snowflakes{
 				{5, 3}: "*",
 				{5, 4}: "+",
@@ -147,7 +147,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			},
 		},
 		{
-			name: "mixed falling and stopped",
+			name: "collision triggers left slide while others fall freely",
 			snowflakes: Snowflakes{
 				{3, 5}:  "*",
 				{3, 6}:  "+",
@@ -169,7 +169,7 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			want:       Snowflakes{},
 		},
 		{
-			name: "stack building from bottom",
+			name: "collision near bottom triggers left diagonal slide",
 			snowflakes: Snowflakes{
 				{5, 9}:  "*",
 				{5, 10}: "+",
@@ -178,6 +178,106 @@ func TestSnowflakes_AdvanceAll(t *testing.T) {
 			want: Snowflakes{
 				{4, 10}:  "*",
 				{5, 10}: "+",
+			},
+		},
+		{
+			name: "collision triggers right slide when left path blocked",
+			snowflakes: Snowflakes{
+				{5, 3}: "*",
+				{5, 4}: "+",
+				{4, 4}: ".",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{6, 4}: "*",
+				{5, 5}: "+",
+				{4, 5}: ".",
+			},
+		},
+		{
+			name: "left path blocked at second level triggers right slide",
+			snowflakes: Snowflakes{
+				{5, 3}: "*",
+				{5, 4}: "+",
+				{4, 5}: ".",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{6, 4}: "*",
+				{5, 5}: "+",
+				{4, 6}: ".",
+			},
+		},
+		{
+			name: "snowflake stays in place when both sides blocked",
+			snowflakes: Snowflakes{
+				{5, 3}: "*",
+				{5, 4}: "+",
+				{4, 4}: ".",
+				{6, 4}: "x",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{5, 3}: "*",
+				{5, 5}: "+",
+				{4, 5}: ".",
+				{6, 5}: "x",
+			},
+		},
+		{
+			name: "collision at left boundary (x=0) slides left to negative x",
+			snowflakes: Snowflakes{
+				{0, 3}: "*",
+				{0, 4}: "+",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{-1, 4}: "*",
+				{0, 5}:  "+",
+			},
+		},
+		{
+			name: "collision at left boundary with right path blocked triggers right slide",
+			snowflakes: Snowflakes{
+				{0, 3}: "*",
+				{0, 4}: "+",
+				{1, 4}: ".",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{-1, 4}: "*",
+				{0, 5}:  "+",
+				{1, 5}:  ".",
+			},
+		},
+		{
+			name: "multiple snowflakes slide in same frame",
+			snowflakes: Snowflakes{
+				{3, 3}: "*",
+				{3, 4}: "+",
+				{7, 3}: ".",
+				{7, 4}: "x",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{2, 4}: "*",
+				{3, 5}: "+",
+				{6, 4}: ".",
+				{7, 5}: "x",
+			},
+		},
+		{
+			name: "cascading slide attempts from vertical stack",
+			snowflakes: Snowflakes{
+				{5, 2}: "*",
+				{5, 3}: "+",
+				{5, 4}: ".",
+			},
+			maxY: 10,
+			want: Snowflakes{
+				{4, 3}: "*",
+				{4, 4}: "+",
+				{5, 5}: ".",
 			},
 		},
 	}
