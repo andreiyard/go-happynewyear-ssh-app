@@ -2,3 +2,6 @@
 
 # Ignore SSH server generated key
 .ssh/
+
+# Ignore compiled binaries
+bin/
