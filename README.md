@@ -28,6 +28,5 @@ go run ./cmd/app-ssh
 
 ## TODO:
 - Add preview image to the repo
-- Add unit tests
 - Add CI/CD to build binaries and Docker container (Github actions)
 - Implement 12 factor app methodology
