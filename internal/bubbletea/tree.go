@@ -5,8 +5,6 @@ type Tree map[Point]string
 func newTree(w, h, windowW, windowH int) Tree {
 	tree := make(Tree)
 
-	// TODO: Move tree offset to different function
-
 	// Our tree must start at the bottom middle
 	yOffset := windowH - h
 	xOffset := windowW/2 - w/2
